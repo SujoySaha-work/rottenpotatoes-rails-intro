@@ -12,30 +12,37 @@ class MoviesController < ApplicationController
 
   def index
 
-     @all_ratings = Movie.all_ratings
-     @checked = params[:ratings]
-     init = Hash.new
-     if @checked == nil
-          @set_now = true #condition for first time
-          @all_ratings.each {|x| init[x] = 1}
-          @checked = init
-     else 
-          @set_now = false  
-     end 
-     if params[:alphabetical_order] != nil
-       @movies = Movie.order(params[:alphabetical_order])
-       @sorted = params[:alphabetical_order]
-     elsif  params[:ratings] != nil
-        @movies = Movie.where({rating:  params[:ratings].keys }).order(params[:alphabetical_order])
-        @sorted = params[:alphabetical_order]
-       
-     else 
-        @movies = Movie.all
-     end
-
+    
+     #gather all movies
+     @movies = Movie.all
+     #extract all ratings
+     @all_ratings = @movies.all_ratings
      
+     init = Hash.new 
+     # create new session and set all to true(1) for first time visit
+     if session[:checked] == nil && params[:ratings] == nil
+         session[:checked] = init
+     	   @all_ratings.each {|x| session[:checked][x] = 1}
+     end
+     # save current session for ratings for user for non-first time visit
+     if params[:ratings] != nil  
+       	session[:checked] = params[:ratings] 
+       	@checked = session[:checked]
+     end
+     #save the current session for user preference for alphabetical sorting order of release dates and movie names
+     if params[:alphabetical_order] != nil
+        session[:alphabetical_order] = params[:alphabetical_order]
+        @sorted = params[:alphabetical_order] 
+     end
+     
+     # update @movies with only required movies based on ratings and associated order
+     @movies = @movies.where({rating: session[:checked].keys }).order(session[:alphabetical_order])
+     
+     #use previous session keys to handle edge cases
+     if ( session[:checked] != params[:ratings] || session[:alphabetical_order] != params[:alphabetical_order] )
+      redirect_to({ 'alphabetical_order': session[:alphabetical_order], 'ratings': session[:checked]})
+     end 
    
-
   end
 
   def new
