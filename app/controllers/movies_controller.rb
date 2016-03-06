@@ -33,36 +33,9 @@ class MoviesController < ApplicationController
         @movies = Movie.all
      end
 
-=begin     
-     @movies = Movie
      
-     @all_ratings = @movies.all_ratings
-          
-     if session[:checked] == nil    # create new session and set all to true for first time visit
-         session[:checked] = Hash.new
-     	   @all_ratings.each {|x| session[:checked][x] = 1}
-     elsif params[:ratings]  # save current session for user for non-first time visit
-       	 session[:checked] = params[:ratings]     
-     end
-     @checked = session[:checked]
-    
-     if params[:alphabetical_order]
-       session[:alphabetical_order] = params[:alphabetical_order]
-     end
-     
-     @sorted = params[:alphabetical_order]     
-     sort_rate = { 'alphabetical_order': session[:alphabetical_order], 'ratings': session[:checked]}
-     # retrieve only required movies 
-     @movies = Movie.where({rating:  session[:checked].keys })
-     # sort movies
-     if session[:alphabetical_order]
-       @movies = @movies.order(session[:alphabetical_order])
-     end
-     
-     if ( session[:checked] != params[:ratings] || session[:alphabetical_order] != params[:alphabetical_order] )
-       redirect_to(sort_rate)
-     end
-=end
+   
+
   end
 
   def new
